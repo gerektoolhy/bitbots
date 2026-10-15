@@ -121,15 +121,42 @@ function render() {
     meta.className = "meta";
     const stripped = shouldStrip(request.url);
     meta.textContent = `${request.method} ${request.mime || request.type}${stripped ? " · query stripped" : ""}`;
+    item.dataset.id = String(request.id);
     item.append(status, name, meta);
-    item.addEventListener("click", () => {
-      selectedId = request.id;
-      render();
-      showDetail(request.id);
-    });
+    item.addEventListener("click", () => selectRequest(request.id));
     listEl.append(item);
   }
 }
+
+function selectRequest(id) {
+  const request = requests.find((entry) => entry.id === id);
+  if (!request) return;
+  selectedId = id;
+  for (const item of listEl.children) {
+    item.classList.toggle("selected", Number(item.dataset.id) === id);
+  }
+  const selected = listEl.querySelector("li.selected");
+  if (selected) selected.scrollIntoView({ block: "nearest" });
+  showDetail(id);
+}
+
+function moveSelection(direction) {
+  const shown = visibleRequests();
+  if (!shown.length) return;
+  const current = shown.findIndex((request) => request.id === selectedId);
+  let next;
+  if (current === -1) next = direction > 0 ? 0 : shown.length - 1;
+  else next = Math.min(shown.length - 1, Math.max(0, current + direction));
+  selectRequest(shown[next].id);
+}
+
+window.addEventListener("keydown", (event) => {
+  if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+  const active = document.activeElement;
+  if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) return;
+  event.preventDefault();
+  moveSelection(event.key === "ArrowDown" ? 1 : -1);
+});
 
 function showEmpty() {
   detailEl.className = "detail empty";
