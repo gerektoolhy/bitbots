@@ -8,7 +8,7 @@ Chrome does not let extensions add a tab inside the Network request details (Hea
 
 1. Open `chrome://extensions`.
 2. Turn on **Developer mode**.
-3. Choose **Load unpacked** and select the `extension` folder.
+3. Choose **Load unpacked** and select the `clean-preview` folder (`~/work/bitbots/clean-preview`).
 4. Open DevTools on a page and select the **Clean Preview** panel.
 5. Reload the page so requests are captured after the panel is open.
 
