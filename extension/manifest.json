@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Clean Preview",
+  "version": "1.0.0",
+  "description": "DevTools panel that previews network requests with query strings stripped.",
+  "devtools_page": "devtools.html",
+  "permissions": ["storage"],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
