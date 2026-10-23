@@ -21,5 +21,6 @@ Chrome does not let extensions add a tab inside the Network request details (Hea
 
 Some CDNs sign the query string. If the image fails to load, the panel says so — the signature is required and stripping it cannot produce a working URL.
 
-OpenWhen (separate hobby app) lives in `OpenWhen/`.
-See `OpenWhen/README.md` for local run and Render deploy notes.
+## OpenWhen
+
+The streak app is in `OpenWhen/`. Environment variables and the Render setup are documented in `OpenWhen/README.md`.

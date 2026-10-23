@@ -1,50 +1,49 @@
 # OpenWhen
 
-Hobby hello-world: a React (Vite) page and an ASP.NET Core minimal API in one process. The API serves the built page, `GET /api/hello`, and `GET /health`. There is no database.
+A signed-in person starts a streak (a habit name and a target length in days) and gets a join code. Someone else joins with that code. Each member checks in once per calendar day in their own timezone. A member can leave a text message for one other member. The recipient can see that a message is waiting, and can read it only after their current streak reaches the target. If they were allowed to read it, a later missed day does not hide it again.
 
-`GET /api/hello` returns `{"message":"Hello from OpenWhen"}`. `GET /health` returns 200 and does not touch a database.
+The browser app is Clerk (Google sign-in is turned on in the Clerk dashboard). The API checks the Clerk session token on every protected call and uses the token subject as the user id.
 
-Requires the .NET 10 SDK and Node.js 22.
+ASP.NET Core serves the built React app and the API in one process. `GET /health` returns 200 and does not touch the database. On startup the API applies EF Core migrations to Postgres.
 
-## Run locally
+## Environment variables
 
-From `OpenWhen/`:
+The app reads these and nothing else for secrets. Do not commit values.
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Postgres connection string. A Render-style `postgres://USER:PASSWORD@HOST:5432/DATABASE` URL is accepted, as is an Npgsql key/value string. |
+| `CLERK_PUBLISHABLE_KEY` | Clerk publishable key (`pk_...`). The browser loads it from `GET /api/config`. |
+| `CLERK_SECRET_KEY` | Clerk secret key (`sk_...`). The API uses it to fetch the instance JWKS and verify session tokens. |
+| `PORT` | Optional. Render sets this. The process listens on it (default `8080`). |
+
+New users default to the `Europe/Vilnius` timezone. A check-in on the next local day continues the streak. A missed local day resets it to 1 on the next check-in. Checking in again the same local day does not increment.
+
+## Render
+
+The service is a Docker web service. Set the root directory to `OpenWhen`, the branch to `main`, and the health check path to `/health`. Provide `DATABASE_URL`, `CLERK_PUBLISHABLE_KEY`, and `CLERK_SECRET_KEY`. No photo, video, or file upload is implemented.
+
+## Local API
 
 ```bash
-cd client
-npm install
-npm run build
-cd ../src/OpenWhen.Api
-dotnet run
+export DATABASE_URL="Host=localhost;Database=openwhen;Username=postgres;Password=postgres"
+export CLERK_PUBLISHABLE_KEY="pk_test_..."
+export CLERK_SECRET_KEY="sk_test_..."
+dotnet run --project src/OpenWhen.Api
 ```
 
-Open http://localhost:5080. The page loads the hello message from the API.
-
-For frontend-only reload while editing, start the API, then in another terminal:
+The UI dev server proxies `/api` to that process:
 
 ```bash
-cd client
+cd web
+npm install
 npm run dev
 ```
 
-Vite proxies `/api` and `/health` to http://localhost:5080.
-
-Run the API test:
+## Tests
 
 ```bash
 dotnet test
 ```
 
-## Deploy on Render (free web service)
-
-Do this in the Render dashboard. A free web service sleeps after idle; the first request after sleep can take a minute.
-
-1. Push this repo to GitHub.
-2. In Render, create a **Web Service** and connect the repository.
-3. Set the root directory to `OpenWhen` so the build context is this folder.
-4. Choose **Docker**. Render uses `OpenWhen/Dockerfile`.
-5. Leave the instance type on the free web service. No environment variables or secrets are required.
-6. Set the health check path to `/health`.
-7. Deploy. Render sets `PORT`; the app listens on that port when it is present. Locally and in the image default, it listens on 8080 unless `launchSettings.json` or `PORT` says otherwise.
-
-The service is one container. It does not use a database or a paid add-on.
+Tests use SQLite and signed test tokens. They do not need Postgres or Clerk.
