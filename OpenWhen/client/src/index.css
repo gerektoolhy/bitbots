@@ -1,0 +1,49 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  line-height: 1.45;
+  background: #f4f1ea;
+  color: #1c1915;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem;
+  max-width: 36rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: #6b6258;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 10vw, 4rem);
+  line-height: 1;
+  font-weight: 650;
+}
+
+.message {
+  margin: 1.25rem 0 0;
+  font-size: clamp(1.15rem, 4.5vw, 1.5rem);
+}
+
+.error {
+  color: #8a2b1b;
+}
