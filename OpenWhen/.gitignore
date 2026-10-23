@@ -1,0 +1,6 @@
+client/node_modules
+client/dist
+src/OpenWhen.Api/wwwroot
+**/bin
+**/obj
+*.user
