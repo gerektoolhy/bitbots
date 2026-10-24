@@ -3,6 +3,6 @@
     <Project Path="src/OpenWhen.Api/OpenWhen.Api.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/OpenWhen.Api.Tests/OpenWhen.Api.Tests.csproj" />
+    <Project Path="tests/OpenWhen.Tests/OpenWhen.Tests.csproj" />
   </Folder>
 </Solution>

@@ -2,6 +2,9 @@
 **/bin
 **/obj
 **/node_modules
-**/wwwroot
-client/dist
+web/dist
+src/OpenWhen.Api/wwwroot
 tests
+**/*.user
+.gitignore
+README.md
