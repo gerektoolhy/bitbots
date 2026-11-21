@@ -6,14 +6,16 @@ import "./styles.css";
 
 function Root() {
   const [publishableKey, setPublishableKey] = useState<string | null>(null);
+  const [proxyUrl, setProxyUrl] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/config")
       .then(async (response) => {
-        if (!response.ok) throw new Error("OpenWhen could not read CLERK_PUBLISHABLE_KEY.");
-        const body = (await response.json()) as { clerkPublishableKey: string };
+        const body = (await response.json()) as { clerkPublishableKey?: string; clerkProxyPath?: string; detail?: string };
+        if (!response.ok || !body.clerkPublishableKey) throw new Error(body.detail ?? "OpenWhen could not read CLERK_PUBLISHABLE_KEY.");
         setPublishableKey(body.clerkPublishableKey);
+        setProxyUrl(body.clerkProxyPath ? new URL(body.clerkProxyPath, window.location.origin).toString() : undefined);
       })
       .catch((reason: unknown) => {
         setError(reason instanceof Error ? reason.message : "Could not load sign-in.");
@@ -28,7 +30,7 @@ function Root() {
   }
 
   return (
-    <ClerkProvider publishableKey={publishableKey} signInUrl="/" signUpUrl="/" afterSignOutUrl="/">
+    <ClerkProvider publishableKey={publishableKey} proxyUrl={proxyUrl} signInUrl="/" signUpUrl="/" afterSignOutUrl="/">
       <App />
     </ClerkProvider>
   );
