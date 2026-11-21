@@ -2,7 +2,7 @@
 
 A signed-in person starts a streak (a habit name and a target length in days) and gets a join code. Someone else joins with that code. Each member checks in once per calendar day in their own timezone. A member can leave a text message for one other member. The recipient can see that a message is waiting, and can read it only after their current streak reaches the target. If they were allowed to read it, a later missed day does not hide it again.
 
-The browser app is Clerk (Google sign-in is turned on in the Clerk dashboard). The API checks the Clerk session token on every protected call and uses the token subject as the user id.
+The browser app is Clerk. Signed-out people only see Continue with Google, which starts Clerk OAuth with strategy `oauth_google` for both sign-in and sign-up. Turn off email and password under Clerk → User & authentication if that toggle exists. The API checks the Clerk session token on every protected call and uses the token subject as the user id.
 
 ASP.NET Core serves the built React app and the API in one process. `GET /health` returns 200 and does not touch the database. On startup the API applies EF Core migrations to Postgres.
 

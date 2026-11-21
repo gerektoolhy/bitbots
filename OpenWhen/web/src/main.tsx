@@ -28,7 +28,7 @@ function Root() {
   }
 
   return (
-    <ClerkProvider publishableKey={publishableKey}>
+    <ClerkProvider publishableKey={publishableKey} signInUrl="/" signUpUrl="/" afterSignOutUrl="/">
       <App />
     </ClerkProvider>
   );
