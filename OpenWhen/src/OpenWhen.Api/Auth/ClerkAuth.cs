@@ -8,6 +8,7 @@ namespace OpenWhen.Api.Auth;
 public static class ClerkKeys
 {
     public const string PublishableEnv = "CLERK_PUBLISHABLE_KEY";
+    public const string SecretEnv = "CLERK_SECRET_KEY";
     public const string JwksPath = ".well-known/jwks.json";
 
     public static Uri JwksUri(string issuer) => new(issuer.TrimEnd('/') + "/" + JwksPath);
