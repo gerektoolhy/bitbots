@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
@@ -9,7 +8,9 @@ namespace OpenWhen.Api.Auth;
 public static class ClerkKeys
 {
     public const string PublishableEnv = "CLERK_PUBLISHABLE_KEY";
-    public const string SecretEnv = "CLERK_SECRET_KEY";
+    public const string JwksPath = ".well-known/jwks.json";
+
+    public static Uri JwksUri(string issuer) => new(issuer.TrimEnd('/') + "/" + JwksPath);
 
     public static string Issuer(string publishableKey)
     {
@@ -44,15 +45,13 @@ public static class ClerkAuthExtensions
     public static void AddClerkAuthentication(this WebApplicationBuilder builder)
     {
         var publishable = Environment.GetEnvironmentVariable(ClerkKeys.PublishableEnv);
-        var secret = Environment.GetEnvironmentVariable(ClerkKeys.SecretEnv);
-        if (string.IsNullOrWhiteSpace(publishable) || string.IsNullOrWhiteSpace(secret))
-            throw new InvalidOperationException($"{ClerkKeys.PublishableEnv} and {ClerkKeys.SecretEnv} are required.");
+        if (string.IsNullOrWhiteSpace(publishable))
+            throw new InvalidOperationException($"{ClerkKeys.PublishableEnv} is required.");
 
         var issuer = ClerkKeys.Issuer(publishable);
         builder.Services.AddHttpClient<ClerkJwks>(client =>
         {
-            client.BaseAddress = new Uri("https://api.clerk.com/");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", secret);
+            client.BaseAddress = new Uri(issuer.TrimEnd('/') + "/");
             client.Timeout = TimeSpan.FromSeconds(10);
         });
         builder.Services.AddSingleton(new ClerkIssuer(issuer));
@@ -77,7 +76,7 @@ public sealed class ClerkJwks(HttpClient http)
             if (_keys is not null && DateTimeOffset.UtcNow - _fetchedAt < TimeSpan.FromHours(1))
                 return _keys;
 
-            using var response = http.GetAsync("v1/jwks").GetAwaiter().GetResult();
+            using var response = http.GetAsync(ClerkKeys.JwksPath).GetAwaiter().GetResult();
             response.EnsureSuccessStatusCode();
             var json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             var keys = new JsonWebKeySet(json).GetSigningKeys();
